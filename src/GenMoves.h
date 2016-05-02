@@ -91,7 +91,6 @@ public:
         ASSERT(chessboard[KING_BLACK]);
         ASSERT(chessboard[KING_WHITE]);
         gen_list[listId].nextBestMove = 0;
-//        gen_list[listId].equal = false;
         u64 allpieces = enemies | friends;
         if (std::is_same<TYPE_MODE, PERFT_MODE>::value) {
             int kingPosition = BITScanForward(chessboard[KING_BLACK + side]);

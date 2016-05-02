@@ -88,13 +88,13 @@ public:
 
         if (smp && type == HASH_GREATER)spinlockHashGreater.lock();
         if (smp && type == HASH_ALWAYS)spinlockHashAlways.lock();
-        if (hash->key == zobristKeyR) {
-            b = true;
-            memcpy(hashMini, hash, sizeof(_Thash));
-        }
+            if (hash->key == zobristKeyR) {
+                b = true;
+                memcpy(hashMini, hash, sizeof(_Thash));
+            }
         if (smp && type == HASH_GREATER)spinlockHashGreater.unlock();
         if (smp && type == HASH_ALWAYS)spinlockHashAlways.unlock();
-
+      
         return b;
     }
 

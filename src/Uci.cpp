@@ -60,7 +60,9 @@ void Uci::listner(IterativeDeeping *it) {
             perft->join();
             break;
         }
-        getline(cin, command);
+        if (!getline(cin, command)) {
+            break;
+        }
         istringstream uip(command, ios::in);
         getToken(uip, token);
         knowCommand = false;
@@ -105,8 +107,7 @@ void Uci::listner(IterativeDeeping *it) {
             knowCommand = true;
             searchManager.display();
         } else if (token == "isready") {
-            knowCommand = true;
-            searchManager.setRunning(0);
+            knowCommand = true;       
             cout << "readyok\n";
         } else if (token == "uci") {
             knowCommand = true;
@@ -147,7 +148,7 @@ void Uci::listner(IterativeDeeping *it) {
             searchManager.setRunning(0);
             searchManager.setRunningThread(false);
         } else if (token == "ucinewgame") {
-            while (it->getRunning());
+            while (it->getRunning())usleep(5);
             searchManager.loadFen();
             searchManager.clearHash();
             knowCommand = true;
@@ -300,7 +301,7 @@ void Uci::listner(IterativeDeeping *it) {
                 }
             }
         } else if (token == "position") {
-            while (it->getRunning());
+            while (it->getRunning())usleep(5);
             knowCommand = true;
             searchManager.setRepetitionMapCount(0);
             getToken(uip, token);
@@ -378,16 +379,16 @@ void Uci::listner(IterativeDeeping *it) {
                     winc -= (int) (winc * 0.1);
                     searchManager.setMaxTimeMillsec(winc + wtime / 40);
                     if (btime > wtime) {
-                        searchManager.setMaxTimeMillsec(searchManager.getMaxTimeMillsec() - (int) (searchManager.getMaxTimeMillsec() * ((135.0 - wtime * 100.0 / btime) / 100.0)));
+                        searchManager.setMaxTimeMillsec(searchManager.getMaxTimeMillsec(0) - (int) (searchManager.getMaxTimeMillsec(0) * ((135.0 - wtime * 100.0 / btime) / 100.0)));
                     }
                 } else {
                     binc -= (int) (binc * 0.1);
                     searchManager.setMaxTimeMillsec(binc + btime / 40);
                     if (wtime > btime) {
-                        searchManager.setMaxTimeMillsec(searchManager.getMaxTimeMillsec() - (int) (searchManager.getMaxTimeMillsec() * ((135.0 - btime * 100.0 / wtime) / 100.0)));
+                        searchManager.setMaxTimeMillsec(searchManager.getMaxTimeMillsec(0) - (int) (searchManager.getMaxTimeMillsec(0) * ((135.0 - btime * 100.0 / wtime) / 100.0)));
                     }
                 }
-                lastTime = searchManager.getMaxTimeMillsec();
+                lastTime = searchManager.getMaxTimeMillsec(0);
             }
             if (!uciMode) {
                 searchManager.display();
