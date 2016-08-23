@@ -20,9 +20,10 @@
 
 #include "ChessBoard.h"
 #include "util/Bitboard.h"
+//#include "Endgame.h"
 #include <vector>
 
-class GenMoves : public ChessBoard {
+class GenMoves : public ChessBoard /* add Endgame and remove ChessBoard TODO*/ {
 
 public:
     static const int MAX_MOVE = 130;
@@ -255,6 +256,7 @@ public:
 
     bool makemove(_Tmove *move, bool rep = true, bool = false);
 
+    //bool isPinned(const int side, const uchar Position, const uchar piece);
     void incListId() {
         listId++;
 #ifdef DEBUG_MODE
@@ -543,7 +545,11 @@ private:
         };
     }
 
+//    int performRankFileCaptureCount(const int, const u64 enemies, const u64 allpieces);
+
     int performRankFileCaptureAndShiftCount(const int position, const u64 enemies, const u64 allpieces);
+
+//    int performRankFileShiftCount(const int piece, const u64 allpieces);
 
     void popStackMove() {
         ASSERT(repetitionMapCount > 0);

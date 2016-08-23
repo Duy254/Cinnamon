@@ -18,6 +18,7 @@
 
 #include "Uci.h"
 #include "util/GetOpt.h"
+#include "util/Bitboard.h"
 
 #if defined(DEBUG_MODE) || defined(FULL_TEST)
 

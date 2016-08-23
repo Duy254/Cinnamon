@@ -40,7 +40,7 @@ void Search::aspirationWindow(const int depth, const int valWin) {
     init();
 
     if (depth == 1) {
-        valWindow = search(SMP_NO, depth, -_INFINITE - 1, _INFINITE + 1);
+        valWindow = search(SMP_NO, depth, -_INFINITE, _INFINITE);
     } else {
         ASSERT(INT_MAX != valWindow);
         int tmp = search(SMP_NO, mainDepth, valWindow - VAL_WINDOW, valWindow + VAL_WINDOW);
@@ -159,6 +159,12 @@ int Search::quiescence(int alpha, int beta, const char promotionPiece, int N_PIE
     if (!(numMovesq++ & 1023)) {
         setRunning(checkTime());
     }
+//    int is_incheck_side = inCheck<side>();
+//    if (!is_incheck_side) {
+//        int score = lazyEval<side>();
+//        if (score + FUTIL_MARGIN < alpha)
+//            return score;
+//    }
 
     int score = getScore(side, N_PIECE, alpha, beta, false);
     if (score >= beta) {
@@ -356,15 +362,9 @@ void Search::setMainParam(const bool smp, const int depth) {
 int Search::search(bool smp, int depth, int alpha, int beta) {
     ASSERT_RANGE(depth, 0, MAX_PLY);
     if (smp) {
-        return getSide() ? search<WHITE, SMP_YES>(depth, alpha, beta, &pvLine, bitCount(getBitmap<WHITE>() | getBitmap<BLACK>()), &mainMateIn) : search<BLACK, SMP_YES>(depth, alpha, beta, &pvLine,
-                                                                                                                                                                        bitCount(getBitmap<WHITE>() |
-                                                                                                                                                                                 getBitmap<BLACK>()),
-                                                                                                                                                                        &mainMateIn);
+        return getSide() ? search<WHITE, SMP_YES>(depth, alpha, beta, &pvLine, bitCount(getBitmap<WHITE>() | getBitmap<BLACK>()), &mainMateIn) : search<BLACK, SMP_YES>(depth, alpha, beta, &pvLine, bitCount(getBitmap<WHITE>() | getBitmap<BLACK>()), &mainMateIn);
     } else {
-        return getSide() ? search<WHITE, SMP_NO>(depth, alpha, beta, &pvLine, bitCount(getBitmap<WHITE>() | getBitmap<BLACK>()), &mainMateIn) : search<BLACK, SMP_NO>(depth, alpha, beta, &pvLine,
-                                                                                                                                                                      bitCount(getBitmap<WHITE>() |
-                                                                                                                                                                               getBitmap<BLACK>()),
-                                                                                                                                                                      &mainMateIn);
+        return getSide() ? search<WHITE, SMP_NO>(depth, alpha, beta, &pvLine, bitCount(getBitmap<WHITE>() | getBitmap<BLACK>()), &mainMateIn) : search<BLACK, SMP_NO>(depth, alpha, beta, &pvLine, bitCount(getBitmap<WHITE>() | getBitmap<BLACK>()), &mainMateIn);
     }
 }
 
@@ -395,6 +395,7 @@ int Search::search(int depth, int alpha, int beta, _TpvLine *pline, int N_PIECE,
             }
             ASSERT_RANGE(res, -_INFINITE, _INFINITE);
             ASSERT(mainDepth >= depth);
+//            cout << side << " " << (*mateIn) << " " << res << "\n";
             return res;
         }
     }
@@ -408,10 +409,13 @@ int Search::search(int depth, int alpha, int beta, _TpvLine *pline, int N_PIECE,
     int extension = 0;
     int is_incheck_side = inCheck<side>();
     if (!is_incheck_side && depth != mainDepth) {
-        if (checkInsufficientMaterial(N_PIECE) || checkDraw(chessboard[ZOBRISTKEY_IDX])) {
+        if (checkInsufficientMaterial(N_PIECE)) {
             if (inCheck<side ^ 1>()) {
                 return _INFINITE - (mainDepth - depth + 1);
             }
+            return -lazyEval<side>() * 2;
+        }
+        if (checkDraw(chessboard[ZOBRISTKEY_IDX])) {
             return -lazyEval<side>() * 2;
         }
     }

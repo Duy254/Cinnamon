@@ -51,6 +51,8 @@ public:
 
     int getHashSize();
 
+//    int getValue(int i);
+
     void startClock();
 
     string boardToFen();
@@ -70,6 +72,7 @@ public:
     void setRunningThread(bool r);
 
     void search(int mply);
+
 
     void setRunning(int i);
 

@@ -111,7 +111,8 @@ void IterativeDeeping::run() {
     int mateIn = INT_MAX;
     string pvv;
     _Tmove resultMove;
-    while (searchManager.getRunning(0)) {
+    while (searchManager.getRunning(0) /*&& mateIn == INT_MAX && mply < maxDepth*/) {
+//        mateIn = INT_MAX;
         totMoves = 0;
         ++mply;
         searchManager.init();
@@ -120,6 +121,10 @@ void IterativeDeeping::run() {
 
         searchManager.setRunningThread(1);
         searchManager.setRunning(1);
+//        if (mply == 2) {
+//            searchManager.setRunningAll(1);
+//        }
+
         if (!searchManager.getRes(resultMove, ponderMove, pvv, &mateIn)) {
             debug("IterativeDeeping cmove == 0, exit");
             break;

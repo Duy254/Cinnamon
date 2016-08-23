@@ -18,6 +18,7 @@
 
 #include "SearchManager.h"
 
+
 SearchManager::SearchManager() {
     SET(checkSmp1, 0);
 
@@ -43,6 +44,7 @@ SearchManager::SearchManager() {
             };
         }
     }
+
 }
 
 void SearchManager::search(const int mply) {
@@ -207,7 +209,7 @@ void SearchManager::clearAge() {
 }
 
 int SearchManager::getForceCheck() {
-    return getThread(0).getForceCheck();
+    return getThread(0).getForceCheck();// static variable
 }
 
 u64 SearchManager::getZobristKey(int id) {
@@ -215,11 +217,11 @@ u64 SearchManager::getZobristKey(int id) {
 }
 
 void SearchManager::setForceCheck(bool a) {
-    getThread(0).setForceCheck(a);
+    getThread(0).setForceCheck(a);    // static variable
 }
 
 void SearchManager::setRunningThread(bool r) {
-    getThread(0).setRunningThread(r);
+    getThread(0).setRunningThread(r);// static variable
 }
 
 void SearchManager::setRunning(int i) {
