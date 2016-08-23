@@ -73,7 +73,6 @@ public:
 
     void search(int mply);
 
-
     void setRunning(int i);
 
     int getRunning(int i);
@@ -124,8 +123,16 @@ public:
 
     bool setNthread(int);
 
-#ifdef DEBUG_MODE
+#if defined(DEBUG_MODE) || defined(FULL_TEST)
 
+    template<int side>
+    u64 getPin(const u64 allpieces, const u64 friends, const int kingPosition) const {
+        return getThread(0).getPin<side>(allpieces, friends, kingPosition);
+    }
+
+#endif
+
+#ifdef DEBUG_MODE
 
     unsigned getCumulativeMovesCount() {
         unsigned i = 0;
@@ -181,6 +188,10 @@ public:
             i += s->totGen;
         }
         return i;
+    }
+
+    u64 getBitmap(const int n, const int side) {
+        return getPool()[n]->getBitmap(side);
     }
 
 #endif

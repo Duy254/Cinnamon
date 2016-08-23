@@ -94,7 +94,7 @@ void IterativeDeeping::run() {
         }
     }
     int sc = 0;
-    u64 totMoves;
+    unsigned totMoves;
 
     mply = 0;
 
@@ -111,8 +111,7 @@ void IterativeDeeping::run() {
     int mateIn = INT_MAX;
     string pvv;
     _Tmove resultMove;
-    while (searchManager.getRunning(0) /*&& mateIn == INT_MAX && mply < maxDepth*/) {
-//        mateIn = INT_MAX;
+    while (searchManager.getRunning(0) ) {
         totMoves = 0;
         ++mply;
         searchManager.init();
@@ -121,9 +120,6 @@ void IterativeDeeping::run() {
 
         searchManager.setRunningThread(1);
         searchManager.setRunning(1);
-//        if (mply == 2) {
-//            searchManager.setRunningAll(1);
-//        }
 
         if (!searchManager.getRes(resultMove, ponderMove, pvv, &mateIn)) {
             debug("IterativeDeeping cmove == 0, exit");
@@ -213,7 +209,7 @@ void IterativeDeeping::run() {
                 cout << "info score cp " << sc << " depth " << mply - extension;
             }
             cout << " nodes " << totMoves << " time " << timeTaken;
-            if (1)cout << " knps " << (totMoves / timeTaken);//TODO
+            cout << " nps " << (totMoves / (1+(timeTaken/1000)));
             cout << " pv " << pvv << endl;
         }
 
@@ -238,7 +234,8 @@ void IterativeDeeping::run() {
     if (ponderEnabled && ponderMove.size()) {
         cout << " ponder " << ponderMove;
     }
-    cout << "\n" << flush;
+
+    cout << endl;
     ADD(checkSmp2, -1);
     ASSERT(!checkSmp2);
     LOCK_RELEASE(running);

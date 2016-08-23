@@ -22,6 +22,15 @@
 #include <set>
 #include "../IterativeDeeping.h"
 
+
+TEST(search, test0) {
+    IterativeDeeping it;
+    it.loadFen("8/pp6/5p1k/2P3Pp/P1P4K/4q1PP/8/6Q1 b - - 0 35");
+    it.start();
+    it.join();
+    EXPECT_EQ("e3g5", it.getBestmove());
+}
+
 TEST(search, test1) {
     IterativeDeeping it;
     it.loadFen("8/p5p1/k3p1p1/5pP1/5PKP/bP2r3/P7/3RB3 w - f6");

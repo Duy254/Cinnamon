@@ -19,6 +19,7 @@
 #include "Uci.h"
 #include "util/GetOpt.h"
 #include "util/Bitboard.h"
+#include "namespaces/board.h"
 
 #if defined(DEBUG_MODE) || defined(FULL_TEST)
 
@@ -39,14 +40,14 @@
  ...a  b  c  d  e  f  g  h
 
 tc="40/4:0+0"
- Rank Name                   Elo    +    - games score oppo. draws
-   1 Cinnamon v2.1.beta1    2009    5    4  5347   51%  2000   40%
-   2 Cinnamon 2.0           2000    4    5  5347   49%  2009   40%
+Rank Name                  Elo    +    - games score oppo. draws 
+   1 Cinnamon v2.1.beta2  2014    5    4  6006   52%  2000   35% 
+   2 Cinnamon 2.0         2000    4    5  6006   48%  2014   35% 
 
 
    # PLAYER                 : RATING    POINTS  PLAYED    (%)
-   1 Cinnamon v2.1.beta1    : 2304.7    2745.5    5347   51.3%
-   2 Cinnamon 2.0           : 2295.3    2601.5    5347   48.7%
+   1 Cinnamon v2.1.beta2    : 2307.7    3135.0    6006   52.2%
+   2 Cinnamon 2.0           : 2292.3    2871.0    6006   47.8%
 
  */
 
@@ -97,9 +98,64 @@ void printHeader() {
     cout << flush;
 }
 
+//u64 link(int a, int b) {TODO cancellare
+//    if (a == b)return 0;
+//    int i = min(a, b);
+//    int j = max(a, b);
+//    u64 res = 0;
+//    if (RANK_AT[i] == RANK_AT[j]) {
+//        int x;
+//        for (x = i; x <= j; x++)res |= POW2[x];
+//        return res;
+//    }
+//    if (FILE_AT[i] == FILE_AT[j]) {
+//        int x;
+//        for (x = i; x <= j; x += 8)res |= POW2[x];
+//        return res;
+//    }
+//    if (DIAGONAL[i] == DIAGONAL[j]) {
+//        int x;
+//        for (x = i; x <= j; x += 7)res |= POW2[x];
+//        return res;
+//    }
+//    if (ANTIDIAGONAL[i] == ANTIDIAGONAL[j]) {
+//        int x;
+//        for (x = i; x <= j; x += 9)res |= POW2[x];
+//        return res;
+//    }
+//    return 0;
+//
+//}
+
+
+
 int main(int argc, char **argv) {
 
+//    for (int i = 0; i < 64; i++) {
+//        cout << "{";
+//        for (int j = 0; j < 64; j++) {
+//        if(i==12 && j==40)
+//            cout <"";
+//            u64 a = ANTIDIAGONAL[i] & ANTIDIAGONAL[j];
+//            u64 d = DIAGONAL[i] & DIAGONAL[j];
+//            u64 f = FILE_[i] & FILE_[j];
+//            u64 r = RANK[i] & RANK[j];
+//            if (i != j)
+//                cout << "0x" << hex << (a | d | f | r) << "ULL,";
+//            else
+//                cout << "0x0ULL,";
+//        }
+//        cout << "},\n";
+//    }
+
+//    _assert(sizeof(_Tmove) == sizeof(u64));
+//    _Tmove test;
+//    memset(&test, 0, sizeof(_Tmove));
+//    test.score = 1;
+//    _assert(*((u64 *) &test) == 0x1000000000000ULL);
+
     printHeader();
+
 #if defined(DEBUG_MODE) || defined(FULL_TEST)
     testing::InitGoogleTest(&argc, argv);
     if (RUN_ALL_TESTS())return 1;
