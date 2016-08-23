@@ -19,6 +19,7 @@
 #pragma once
 
 #include <sys/timeb.h>
+#include <unistd.h>
 #include "Hash.h"
 #include "Eval.h"
 #include "namespaces/def.h"
@@ -48,7 +49,10 @@ public:
 
     void startClock();
 
-    int getRunning() const;
+    int getRunning() const {
+        if (!runningThread)return 0;
+        return GenMoves::getRunning();
+    }
 
     void deleteGtb();
 
@@ -123,12 +127,8 @@ private:
     int valWindow = INT_MAX;
 
     typedef struct {
-        int res;
-        bool hashFlag[2];
-        Hash::_Thash phasheType[2];
-        Hash::_Thash *rootHash[2];
+        _ThashData phasheType[2];
     } _TcheckHash;
-
 
     static bool runningThread;
     _TpvLine pvLine;
@@ -151,52 +151,43 @@ private:
 
     bool checkInsufficientMaterial(const int) const;
 
-    void sortHashMoves(const int listId, const Hash::_Thash &phashe);
+    void sortHashMoves(const int listId, const Hash::_ThashData &phashe);
 
     template<int side, bool smp>
     int quiescence(int alpha, const int beta, const char promotionPiece, const int nPieces, const int depth);
 
     void updatePv(_TpvLine *pline, const _TpvLine *line, const _Tmove *move);
 
-    template<bool type, bool smp, bool quies>
-    FORCEINLINE bool checkHash(const int alpha, const int beta, const int depth, const u64 zobristKeyR, _TcheckHash &checkHashStruct) {
-        Hash::_Thash *phashe;
+    template<bool type, bool quies>
+    FORCEINLINE int checkHash(const int alpha, const int beta, const int depth, const u64 zobristKeyR, _TcheckHash &checkHashStruct) {
 
-        checkHashStruct.hashFlag[type] = false;
-        phashe = &checkHashStruct.phasheType[type];
-
-        if (readHash<smp, type>(checkHashStruct.rootHash, zobristKeyR, phashe)) {
-            if (phashe->from != phashe->to && phashe->flags & 0x3) {    // hashfEXACT or hashfBETA
-                checkHashStruct.hashFlag[type] = true;
-            }
-            if (phashe->depth >= depth) {
+        _ThashData *phashe = &checkHashStruct.phasheType[type];
+        if (phashe->dataU = readHash<type>(zobristKeyR)) {
+            if (phashe->dataS.depth >= depth) {
                 INC(probeHash);
                 if (!currentPly) {
-                    if (phashe->flags == Hash::hashfBETA) {
-                        incKillerHeuristic(phashe->from, phashe->to, 1);
+                    if (phashe->dataS.flags == Hash::hashfBETA) {
+                        incKillerHeuristic(phashe->dataS.from, phashe->dataS.to, 1);
                     }
                 } else {
-                    switch (phashe->flags) {
+                    switch (phashe->dataS.flags) {
                         case Hash::hashfEXACT:
-                            if (phashe->score >= beta) {
+                            if (phashe->dataS.score >= beta) {
                                 INC(n_cut_hashB);
-                                checkHashStruct.res = beta;
-                                return true;
+                                return beta;
                             }
                             break;
                         case Hash::hashfBETA:
-                            if (!quies)incKillerHeuristic(phashe->from, phashe->to, 1);
-                            if (phashe->score >= beta) {
+                            if (!quies)incKillerHeuristic(phashe->dataS.from, phashe->dataS.to, 1);
+                            if (phashe->dataS.score >= beta) {
                                 INC(n_cut_hashB);
-                                checkHashStruct.res = beta;
-                                return true;
+                                return beta;
                             }
                             break;
                         case Hash::hashfALPHA:
-                            if (phashe->score <= alpha) {
+                            if (phashe->dataS.score <= alpha) {
                                 INC(n_cut_hashA);
-                                checkHashStruct.res = alpha;
-                                return true;
+                                return alpha;
                             }
                             break;
                         default:
@@ -208,7 +199,7 @@ private:
             }
             INC(cutFailed);
         }
-        return false;
+        return INT_MAX;
     }
 
 

@@ -18,12 +18,12 @@
 
 #include "Uci.h"
 #include "util/GetOpt.h"
-#include "util/Bitboard.h"
-#include "namespaces/board.h"
 
 #if defined(DEBUG_MODE) || defined(FULL_TEST)
 
 #include <gtest/gtest.h>
+
+void check();
 
 #endif
 
@@ -41,21 +41,19 @@
 
 tc="40/4:0+0"
 Rank Name                  Elo    +    - games score oppo. draws 
-   1 Cinnamon v2.1.beta5   2035    6    6  3094   55%  2000   34%
-   2 Cinnamon 2.0          2000    6    6  3094   45%  2035   34%
+   1 Cinnamon v2.1.beta7  2030    4    4 12182   54%  2000   30% 
+   2 Cinnamon 2.0         2000    4    4 12182   46%  2030   30% 
 
-   # PLAYER             : RATING    POINTS  PLAYED    (%)
-   1 Cinnamon v2.1.beta5    : 2318.4    1709.0    3094   55.2%
-   2 Cinnamon 2.0           : 2281.6    1385.0    3094   44.8%
+   # PLAYER                 : RATING    POINTS  PLAYED    (%)
+   1 Cinnamon v2.1.beta7    : 2315.4    6624.5   12182   54.4%
+   2 Cinnamon 2.0           : 2284.6    5557.5   12182   45.6%
+
 
  4 CORE tc="0/0:15+0.05" with illegal move
-Rank Name                    Elo    +    - games score oppo. draws 
-   1 Cinnamon v2.1.beta5    2014    7    7  2001   52%  2000   33% 
-   2 Cinnamon 2.0           2000    7    7  2001   48%  2014   33% 
+Rank Name                  Elo    +    - games score oppo. draws 
+   1 Cinnamon v2.1.beta7  2030    4    4 12182   54%  2000   30% 
+   2 Cinnamon 2.0         2000    4    4 12182   46%  2030   30% 
 
-   # PLAYER                   : RATING    POINTS  PLAYED    (%)
-   1 Cinnamon v2.1.beta5      : 2307.3    1042.0    2001   52.1%
-   2 Cinnamon 2.0             : 2292.7     959.0    2001   47.9%
 
  */
 
@@ -64,7 +62,7 @@ using namespace _board;
 void printHeader() {
     cout << NAME;
     cout << " UCI by Giuseppe Cannella\n";
-#if UINTPTR_MAX == 0xffffffffffffffffULL
+#if __WORDSIZE == 64
     cout << "64-bit ";
 #else
     cout << "32-bit ";
@@ -106,9 +104,14 @@ void printHeader() {
     cout << flush;
 }
 
+void check() {
+    _assert(sizeof(Hash::_Thash) == 16);
+    _assert(sizeof(_Tmove) == 16);
+}
+
 int main(int argc, char **argv) {
     printHeader();
-
+    check();
 #if defined(DEBUG_MODE) || defined(FULL_TEST)
     testing::InitGoogleTest(&argc, argv);
     if (RUN_ALL_TESTS())return 1;
@@ -122,4 +125,5 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
 

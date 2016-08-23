@@ -52,7 +52,7 @@ namespace _def {
 #define FORCEINLINE __always_inline
 #endif
 
-#define _assert(a) if(!(a)){  print_stacktrace();cout<<dec<<endl<<Time::getLocalTime()<<" ********************************** assert error in "<<FileUtil::getFileName(__FILE__)<< " line "<<__LINE__<<" "<<" **********************************"<<endl;cerr<<flush;std::_Exit(1);};
+#define _assert(a) if(!(a)){  print_stacktrace();cout<<dec<<endl<<Time::getLocalTime()<<" ********************************** assert error in "<<FileUtil::getFileName(__FILE__)<< " line "<<__LINE__<<" "<<" **********************************"<<endl;cerr<<flush;std::exit(1);};
 
 #ifdef DEBUG_MODE
 #define ASSERT(a) _assert(a)
@@ -92,7 +92,7 @@ namespace _def {
 
 
 #ifdef HAS_BSF
-#if UINTPTR_MAX == 0xffffffffffffffff
+#if __WORDSIZE == 64
 
     static inline int BITScanForward(u64 bits) {
         return __builtin_ffsll(bits) - 1;

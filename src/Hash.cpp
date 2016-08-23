@@ -23,8 +23,6 @@ int Hash::HASH_SIZE = 0;
 Hash::_Thash *Hash::hashArray[2];
 mutex Hash::mutexConstructor;
 bool Hash::generated = false;
-Spinlock Hash::spinlockHashGreater;
-Spinlock Hash::spinlockHashAlways;
 
 Hash::Hash() {
     std::lock_guard<std::mutex> lock(mutexConstructor);
@@ -44,7 +42,7 @@ Hash::Hash() {
 
 void Hash::clearAge() {
     for (int i = 0; i < HASH_SIZE; i++) {
-        hashArray[HASH_GREATER][i].entryAge = 0;
+        hashArray[HASH_GREATER][i].u.dataS.entryAge = 0;
     }
 }
 
