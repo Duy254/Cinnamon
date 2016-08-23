@@ -201,6 +201,7 @@ void IterativeDeeping::run() {
             bestmove = Search::decodeBoardinv(resultMove.type, resultMove.from, resultMove.side);
             if (!(resultMove.type & (Search::KING_SIDE_CASTLE_MOVE_MASK | Search::QUEEN_SIDE_CASTLE_MOVE_MASK))) {
                 bestmove += Search::decodeBoardinv(resultMove.type, resultMove.to, resultMove.side);
+                searchManager.setKillerHeuristic(resultMove.from, resultMove.to, 0x40000000);
                 if (resultMove.promotionPiece != -1) {
                     bestmove += tolower(FEN_PIECE[(uchar) resultMove.promotionPiece]);
                 }
@@ -212,7 +213,7 @@ void IterativeDeeping::run() {
                 cout << "info score cp " << sc << " depth " << mply - extension;
             }
             cout << " nodes " << totMoves << " time " << timeTaken;
-            if (0)cout << " knps " << (totMoves / timeTaken);
+            if (1)cout << " knps " << (totMoves / timeTaken);//TODO
             cout << " pv " << pvv << endl;
         }
 

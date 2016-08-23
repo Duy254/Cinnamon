@@ -55,6 +55,14 @@ public:
         performKingShiftCapture(side, ~allpieces);
     }
 
+    void setKillerHeuristic(const int from, const int to, const int value) {
+        if (getRunning()) {
+            ASSERT_RANGE(from, 0, 63);
+            ASSERT_RANGE(to, 0, 63);
+            killerHeuristic[from][to] = value;
+        }
+    }
+
     template<int side>
     bool generateCaptures(const u64 enemies, const u64 friends) {
         ASSERT_RANGE(side, 0, 1);
@@ -511,15 +519,6 @@ protected:
     bool inCheck() const {
         return isAttacked<side>(BITScanForward(chessboard[KING_BLACK + side]), getBitmap<BLACK>() | getBitmap<WHITE>());
     }
-
-    void setKillerHeuristic(const int from, const int to, const int value) {
-        if (getRunning()) {
-            ASSERT_RANGE(from, 0, 63);
-            ASSERT_RANGE(to, 0, 63);
-            killerHeuristic[from][to] = value;
-        }
-    }
-
 
 private:
     int running;

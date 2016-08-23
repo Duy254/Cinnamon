@@ -105,7 +105,8 @@ void Uci::listner(IterativeDeeping *it) {
             knowCommand = true;
             searchManager.display();
         } else if (token == "isready") {
-            knowCommand = true;            
+            knowCommand = true;
+            searchManager.setRunning(0);
             cout << "readyok\n";
         } else if (token == "uci") {
             knowCommand = true;

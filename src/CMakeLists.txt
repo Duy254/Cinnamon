@@ -24,7 +24,6 @@ set(SOURCE_FILES
         Eval.cpp
         Eval.h
         GenMoves.cpp
-        GenMoves.h
         Hash.cpp
         Hash.h
         IterativeDeeping.cpp

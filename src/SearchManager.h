@@ -51,8 +51,6 @@ public:
 
     int getHashSize();
 
-//    int getValue(int i);
-
     void startClock();
 
     string boardToFen();
@@ -60,6 +58,8 @@ public:
     bool setParameter(String param, int value);
 
     void clearKillerHeuristic();
+
+    void setKillerHeuristic(const int from, const int to, const int value);
 
     void clearAge();
 
