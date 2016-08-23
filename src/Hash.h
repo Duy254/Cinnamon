@@ -62,14 +62,14 @@ public:
 
     void setHashSize(int mb);
 
-    int getHashSize();
+    int getHashSize() const;
 
     void clearHash();
 
     void clearAge();
 
     template<bool smp, int type>
-    bool readHash(_Thash *phashe[2], const u64 zobristKeyR, _Thash *hashMini) {
+    bool readHash(_Thash *phashe[2], const u64 zobristKeyR, _Thash *hashMini) const {
         bool b = false;
         _Thash *hash = phashe[type] = &(hashArray[type][zobristKeyR % HASH_SIZE]);
 
@@ -96,7 +96,7 @@ public:
     }
 
     template<bool smp>
-    void recordHash(bool running, _Thash *rootHash[2], const char depth, const char flags, const u64 key, const int score, _Tmove *bestMove) {
+    void recordHash(const bool running, _Thash *rootHash[2], const char depth, const char flags, const u64 key, const int score, const _Tmove *bestMove) {
         ASSERT(key);
         ASSERT(rootHash[HASH_GREATER]);
         ASSERT(rootHash[HASH_ALWAYS]);
@@ -114,7 +114,7 @@ public:
             tmp.from = bestMove->from;
             tmp.to = bestMove->to;
         } else {
-            tmp.from = tmp.to = 0;
+            tmp.from = tmp.to = 0;//TODO return ?
         }
 
         if (smp)spinlockHashGreater.lock();

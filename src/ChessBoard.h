@@ -94,19 +94,19 @@ public:
 
     string boardToFen() const;
 
-    string getFen();
+    string getFen() const;
 
-    char decodeBoard(string);
+    char decodeBoard(const string);
 
     int loadFen(string);
 
-    int getPieceByChar(char);
+    int getPieceByChar(const char) const;
 
 #ifdef DEBUG_MODE
 
-    u64 getBitmap(int side);
+    u64 getBitmap(int side) const;
 
-    bool checkNPieces(std::unordered_map<int, int>);
+    bool checkNPieces(std::unordered_map<int, int>) const;
 
 #endif
 
@@ -115,7 +115,7 @@ public:
         return chessboard[PAWN_BLACK + side] | chessboard[ROOK_BLACK + side] | chessboard[BISHOP_BLACK + side] | chessboard[KNIGHT_BLACK + side] | chessboard[KING_BLACK + side] | chessboard[QUEEN_BLACK + side];
     }
 
-    void setSide(bool b) {
+    void setSide(const bool b) {
         chessboard[SIDETOMOVE_IDX] = b;
     }
 
@@ -180,16 +180,21 @@ protected:
     static const u64 A2C2bit = 0xa000ULL;
     static const u64 H2G2bit = 0x300ULL;
 
-    static const int E1 = 3;
-    static const int E8 = 59;
-    static const int C1 = 5;
+    static const int H1 = 0;
+    static const int G1 = 1;
     static const int F1 = 2;
-    static const int C8 = 61;
-    static const int F8 = 58;
-    static const int D8 = 60;
+    static const int E1 = 3;
+    static const int D1 = 4;
+    static const int C1 = 5;
+    static const int A1 = 7;
     static const int A8 = 63;
     static const int H8 = 56;
     static const int G8 = 57;
+    static const int F8 = 58;
+    static const int E8 = 59;
+    static const int D8 = 60;
+    static const int C8 = 61;
+
     static const u64 BLACK_SQUARES = 0x55AA55AA55AA55AAULL;
     static const u64 WHITE_SQUARES = 0xAA55AA55AA55AA55ULL;
 
@@ -204,13 +209,13 @@ protected:
 
 #ifdef DEBUG_MODE
 
-    void updateZobristKey(int piece, int position) {
+    void updateZobristKey(const int piece, const int position) {
         ASSERT_RANGE(position, 0, 63);
         ASSERT_RANGE(piece, 0, 14);
         chessboard[ZOBRISTKEY_IDX] ^= _random::RANDOM_KEY[piece][position];
     }
 
-    int getPieceAt(int side, u64 bitmapPos);
+    int getPieceAt(const int side, const u64 bitmapPos) const;
 
 #else
 #define updateZobristKey(piece, position) (chessboard[ZOBRISTKEY_IDX] ^= _random::RANDOM_KEY[piece][position])

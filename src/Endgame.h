@@ -29,7 +29,74 @@ public:
 
     virtual ~Endgame();
 
-    int getEndgameValue(const int N_PIECE, const int side);
+
+    template<int side>
+    int getEndgameValue(const _Tboard &structureEval, const int N_PIECE) {
+        ASSERT(N_PIECE != 999);
+        ASSERT_RANGE(side, 0, 1);
+
+        switch (N_PIECE) {
+            case 4 :
+                if (chessboard[QUEEN_BLACK]) {
+                    if (chessboard[PAWN_WHITE]) {
+                        int result = KQKP(WHITE, structureEval.posKing[BLACK], structureEval.posKing[WHITE], BITScanForward(chessboard[PAWN_WHITE]));
+                        return side == BLACK ? result : -result;
+                    } else if (chessboard[ROOK_WHITE]) {
+                        int result = KQKR(structureEval.posKing[BLACK], structureEval.posKing[WHITE]);
+                        return side == BLACK ? result : -result;
+                    }
+                } else if (chessboard[QUEEN_WHITE]) {
+                    if (chessboard[PAWN_BLACK]) {
+                        int result = KQKP(BLACK, structureEval.posKing[WHITE], structureEval.posKing[BLACK], BITScanForward(chessboard[PAWN_BLACK]));
+                        return side == WHITE ? result : -result;
+                    } else if (chessboard[ROOK_BLACK]) {
+                        int result = KQKR(structureEval.posKing[WHITE], structureEval.posKing[BLACK]);
+                        return side == WHITE ? result : -result;
+                    }
+                } else if (chessboard[ROOK_BLACK]) {
+                    if (chessboard[PAWN_WHITE]) {
+                        int result = KRKP<WHITE>(side == BLACK, structureEval.posKing[BLACK], structureEval.posKing[WHITE], BITScanForward(chessboard[ROOK_BLACK]), BITScanForward(chessboard[PAWN_WHITE]));
+                        return side == BLACK ? result : -result;
+                    } else if (chessboard[BISHOP_WHITE]) {
+                        int result = KRKB(structureEval.posKing[WHITE]);
+                        return side == BLACK ? result : -result;
+                    } else if (chessboard[KNIGHT_WHITE]) {
+                        int result = KRKN(structureEval.posKing[WHITE], BITScanForward(chessboard[KNIGHT_WHITE]));
+                        return side == BLACK ? result : -result;
+                    }
+                } else if (chessboard[ROOK_WHITE]) {
+                    if (chessboard[PAWN_BLACK]) {
+                        int result = KRKP<BLACK>(side == WHITE, structureEval.posKing[WHITE], structureEval.posKing[BLACK], BITScanForward(chessboard[ROOK_WHITE]), BITScanForward(chessboard[PAWN_BLACK]));
+                        return side == WHITE ? result : -result;
+                    } else if (chessboard[BISHOP_BLACK]) {
+                        int result = KRKB(structureEval.posKing[BLACK]);
+                        return side == WHITE ? result : -result;
+                    } else if (chessboard[KNIGHT_BLACK]) {
+                        int result = KRKN(structureEval.posKing[WHITE], BITScanForward(chessboard[KNIGHT_BLACK]));
+                        return side == WHITE ? result : -result;
+                    }
+                } else if ((chessboard[BISHOP_BLACK] && chessboard[KNIGHT_BLACK])) {
+                    int result = KBNK(structureEval.posKing[BLACK], structureEval.posKing[WHITE]);
+                    return side == BLACK ? result : -result;
+                } else if (chessboard[BISHOP_WHITE] && chessboard[KNIGHT_WHITE]) {
+                    int result = KBNK(structureEval.posKing[WHITE], structureEval.posKing[BLACK]);
+                    return side == WHITE ? result : -result;
+                }
+                break;
+            case 5:
+                if (chessboard[KNIGHT_WHITE] && bitCount(chessboard[BISHOP_BLACK]) == 2) {
+                    int result = KBBKN(structureEval.posKing[BLACK], structureEval.posKing[WHITE], BITScanForward(chessboard[KNIGHT_WHITE]));
+                    return side == BLACK ? result : -result;
+                } else if (chessboard[KNIGHT_BLACK] && bitCount(chessboard[BISHOP_WHITE]) == 2) {
+                    int result = KBBKN(structureEval.posKing[WHITE], structureEval.posKing[BLACK], BITScanForward(chessboard[KNIGHT_BLACK]));
+                    return side == WHITE ? result : -result;
+                }
+                break;
+            default:
+                break;
+        }
+        return INT_MAX;
+    }
 
 private:
 
@@ -37,7 +104,14 @@ private:
     const int VALUE_KNOWN_WIN = 15000;    //TODO stockfish
     const int penaltyKRKN[8] = {0, 10, 14, 20, 30, 42, 58, 80};    //TODO stockfish
     const int KBNKMateTable[64] = {    //TODO stockfish
-            200, 190, 180, 170, 170, 180, 190, 200, 190, 180, 170, 160, 160, 170, 180, 190, 180, 170, 155, 140, 140, 155, 170, 180, 170, 160, 140, 120, 120, 140, 160, 170, 170, 160, 140, 120, 120, 140, 160, 170, 180, 170, 155, 140, 140, 155, 170, 180, 190, 180, 170, 160, 160, 170, 180, 190, 200, 190, 180, 170, 170, 180, 190, 200};
+            200, 190, 180, 170, 170, 180, 190, 200,
+            190, 180, 170, 160, 160, 170, 180, 190,
+            180, 170, 155, 140, 140, 155, 170, 180,
+            170, 160, 140, 120, 120, 140, 160, 170,
+            170, 160, 140, 120, 120, 140, 160, 170,
+            180, 170, 155, 140, 140, 155, 170, 180,
+            190, 180, 170, 160, 160, 170, 180, 190,
+            200, 190, 180, 170, 170, 180, 190, 200};
 
     const int MateTable[64] = {    //TODO stockfish
             100, 90, 80, 70, 70, 80, 90, 100, 90, 70, 60, 50, 50, 60, 70, 90, 80, 60, 40, 30, 30, 40, 60, 80, 70, 50, 30, 20, 20, 30, 50, 70, 70, 50, 30, 20, 20, 30, 50, 70, 80, 60, 40, 30, 30, 40, 60, 80, 90, 70, 60, 50, 50, 60, 70, 90, 100, 90, 80, 70, 70, 80, 90, 100,};
@@ -94,13 +168,100 @@ private:
 
     int KBBKN(int winnerKingPos, int loserKingPos, int knightPos);
 
-    int KQKR(int winnerKingPos, int loserKingPos);
+    int KQKR(int winnerKingPos, int loserKingPos) {
 
-    int KBNK(int winnerKingPos, int loserKingPos);
+#ifdef DEBUG_MODE
+        std::unordered_map<int, int> pieces1;
+        std::unordered_map<int, int> pieces2;
 
-    int KRKB(int loserKingPos);
+        pieces1[KING_BLACK] = 1;
+        pieces1[KING_WHITE] = 1;
+        pieces1[QUEEN_BLACK] = 1;
+        pieces1[ROOK_WHITE] = 1;
 
-    int KRKN(int loserKingPos, int knightPos);
+        pieces2[KING_BLACK] = 1;
+        pieces2[KING_WHITE] = 1;
+        pieces2[QUEEN_WHITE] = 1;
+        pieces2[ROOK_BLACK] = 1;
+
+        ASSERT(checkNPieces(pieces1) || checkNPieces(pieces2));
+#endif
+
+        ASSERT_RANGE(winnerKingPos, 0, 63);
+        ASSERT_RANGE(loserKingPos, 0, 63);
+        return _board::VALUEQUEEN - _board::VALUEROOK + MateTable[loserKingPos] + DistanceBonus[DISTANCE[winnerKingPos][loserKingPos]];
+    }
+
+    int KBNK(int winnerKingPos, int loserKingPos) {
+
+#ifdef DEBUG_MODE
+        std::unordered_map<int, int> pieces1;
+        std::unordered_map<int, int> pieces2;
+
+        pieces1[KING_BLACK] = 1;
+        pieces1[KING_WHITE] = 1;
+        pieces1[BISHOP_BLACK] = 1;
+        pieces1[KNIGHT_BLACK] = 1;
+
+        pieces2[KING_BLACK] = 1;
+        pieces2[KING_WHITE] = 1;
+        pieces2[BISHOP_WHITE] = 1;
+        pieces2[KNIGHT_WHITE] = 1;
+
+        ASSERT(checkNPieces(pieces1) || checkNPieces(pieces2));
+#endif
+
+        ASSERT_RANGE(winnerKingPos, 0, 63);
+        ASSERT_RANGE(loserKingPos, 0, 63);
+
+        return VALUE_KNOWN_WIN + DistanceBonus[DISTANCE[winnerKingPos][loserKingPos]] + KBNKMateTable[loserKingPos];
+    }
+
+    int KRKB(int loserKingPos) {
+
+#ifdef DEBUG_MODE
+        std::unordered_map<int, int> pieces1;
+        std::unordered_map<int, int> pieces2;
+
+        pieces1[KING_BLACK] = 1;
+        pieces1[KING_WHITE] = 1;
+        pieces1[ROOK_BLACK] = 1;
+        pieces1[BISHOP_WHITE] = 1;
+
+        pieces2[KING_BLACK] = 1;
+        pieces2[KING_WHITE] = 1;
+        pieces2[ROOK_WHITE] = 1;
+        pieces2[BISHOP_BLACK] = 1;
+
+        ASSERT(checkNPieces(pieces1) || checkNPieces(pieces2));
+#endif
+
+        ASSERT_RANGE(loserKingPos, 0, 63);
+        return MateTable[loserKingPos];
+    }
+
+    int KRKN(int loserKingPos, int knightPos) {
+
+#ifdef DEBUG_MODE
+        std::unordered_map<int, int> pieces1;
+        std::unordered_map<int, int> pieces2;
+
+        pieces1[KING_BLACK] = 1;
+        pieces1[KING_WHITE] = 1;
+        pieces1[ROOK_BLACK] = 1;
+        pieces1[KNIGHT_WHITE] = 1;
+
+        pieces2[KING_BLACK] = 1;
+        pieces2[KING_WHITE] = 1;
+        pieces2[ROOK_WHITE] = 1;
+        pieces2[KNIGHT_BLACK] = 1;
+
+        ASSERT(checkNPieces(pieces1) || checkNPieces(pieces2));
+#endif
+
+        ASSERT_RANGE(loserKingPos, 0, 63);
+        return MateTable[loserKingPos] + penaltyKRKN[DISTANCE[loserKingPos][knightPos]];
+    }
 
 };
 

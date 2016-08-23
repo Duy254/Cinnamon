@@ -26,7 +26,7 @@
 using namespace _def;
 namespace _board {
 
-    static const string NAME = "Cinnamon v2.1.beta5";
+    static const string NAME = "Cinnamon v2.1.beta6";
     static const string STARTPOS = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     static const int MAX_PLY = 96;
@@ -73,7 +73,7 @@ namespace _board {
     static const u64 BIG_DIAGONAL = 0x102040810204080ULL;
     static const u64 BIG_ANTIDIAGONAL = 0x8040201008040201ULL;
 
-  typedef struct {
+    typedef struct {
         char promotionPiece;
         char pieceFrom;
         uchar capturedPiece;
@@ -85,16 +85,16 @@ namespace _board {
         bool used;
     } _Tmove;
 
-   /* typedef struct {
-        char promotionPiece:5;
-        char side:2;
-        char pieceFrom:5;
-        uchar capturedPiece:4;
-        uchar from;
-        uchar to;
-        uchar type;
-        short score;//Last position! (sorting)
-    } _Tmove;*/
+    /* typedef struct {
+         char promotionPiece:5;
+         char side:2;
+         char pieceFrom:5;
+         uchar capturedPiece:4;
+         uchar from;
+         uchar to;
+         uchar type;
+         short score;//Last position! (sorting)
+     } _Tmove;*/
 
     typedef struct {
         _Tmove *moveList;

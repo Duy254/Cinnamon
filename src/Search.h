@@ -24,15 +24,7 @@
 #include "namespaces/def.h"
 #include <climits>
 #include "threadPool/Thread.h"
-
-#ifdef JS_MODE
-#include "js/Tablebase.h"
-#else
-
 #include "Tablebase.h"
-
-#endif
-
 
 class Search : public Eval, public Thread<Search>, public Hash {
 
@@ -40,27 +32,23 @@ public:
 
     Search();
 
-    Search(const Search *s) { clone(s); }
-
-    void clone(const Search *);
-
     virtual ~Search();
 
-    void setRunning(int);
+    void setRunning(const int);
 
-    void setPonder(bool);
+    void setPonder(const bool);
 
-    void setNullMove(bool);
+    void setNullMove(const bool);
 
-    void setMaxTimeMillsec(int);
+    void setMaxTimeMillsec(const int);
 
-    bool setParameter(String param, int value);
+    bool setParameter(String param, const int value);
 
-    int getMaxTimeMillsec();
+    int getMaxTimeMillsec() const;
 
     void startClock();
 
-    int getRunning();
+    int getRunning() const;
 
     void deleteGtb();
 
@@ -71,7 +59,7 @@ public:
     void setMainParam(const bool smp, const int depth);
 
     template<bool mainSmp>
-    int search(int depth, int alpha, int beta);
+    int search(const int depth, const int alpha, const int beta);
 
     void run();
 
@@ -81,9 +69,9 @@ public:
 
     Tablebase &getGtb() const;
 
-    void setMainPly(int);
+    void setMainPly(const int);
 
-    bool getGtbAvailable();
+    bool getGtbAvailable() const;
 
     STATIC_CONST int NULLMOVE_DEPTH = 3;
     STATIC_CONST int NULLMOVES_MIN_PIECE = 3;
@@ -93,7 +81,7 @@ public:
     STATIC_CONST int NULLMOVES_R4 = 2;
     STATIC_CONST int VAL_WINDOW = 50;
 
-    void setRunningThread(bool t) {
+    void setRunningThread(const bool t) {
         runningThread = t;
     }
 
@@ -103,7 +91,7 @@ public:
 
     void setGtb(Tablebase &tablebase);
 
-    void setValWindow(int valWin) {
+    void setValWindow(const int valWin) {
         Search::valWindow = valWin;
     }
 
@@ -111,13 +99,13 @@ public:
         return valWindow;
     }
 
-    void setChessboard(_Tchessboard &);
+    void setChessboard(const _Tchessboard &);
 
     _Tchessboard &getChessboard() {
         return chessboard;
     }
 
-    u64 getZobristKey();
+    u64 getZobristKey() const;
 
     int getMateIn();
 
@@ -125,7 +113,14 @@ public:
     unsigned cumulativeMovesCount;
     unsigned totGen;
 #endif
+
 private:
+
+    int mainMateIn;
+    int mainDepth;
+    bool mainSmp;
+
+    int valWindow = INT_MAX;
 
     typedef struct {
         int res;
@@ -134,7 +129,7 @@ private:
         Hash::_Thash *rootHash[2];
     } _TcheckHash;
 
-    int valWindow = INT_MAX;
+
     static bool runningThread;
     _TpvLine pvLine;
     static Tablebase *gtb;
@@ -149,33 +144,26 @@ private:
     bool nullSearch;
     static high_resolution_clock::time_point startTime;
 
-    bool checkDraw(u64);
+    bool checkDraw(const u64) const;
 
     template<int side, bool smp>
-    int search(int depth, int alpha, int beta, _TpvLine *pline, int N_PIECE, int *mateIn);
+    int search(int depth, int alpha, const int beta, _TpvLine *pline, const int nPieces, int *mateIn);
 
-    bool checkInsufficientMaterial(int);
+    bool checkInsufficientMaterial(const int) const;
 
-    void sortHashMoves(int listId, Hash::_Thash &);
+    void sortHashMoves(const int listId, const Hash::_Thash &phashe);
 
     template<int side, bool smp>
-    int quiescence(int alpha, int beta, const char promotionPiece, int, int depth);
+    int quiescence(int alpha, const int beta, const char promotionPiece, const int nPieces, const int depth);
 
     void updatePv(_TpvLine *pline, const _TpvLine *line, const _Tmove *move);
 
-    int mainMateIn;
-    int mainDepth;
-    bool mainSmp;
-    int mainBeta;
-    int mainAlpha;
-
-    template<bool type, bool smp>
-    FORCEINLINE bool checkHash(const bool quies, const int alpha, const int beta, const int depth, const u64 zobristKeyR, _TcheckHash &checkHashStruct) {
+    template<bool type, bool smp, bool quies>
+    FORCEINLINE bool checkHash(const int alpha, const int beta, const int depth, const u64 zobristKeyR, _TcheckHash &checkHashStruct) {
         Hash::_Thash *phashe;
 
         checkHashStruct.hashFlag[type] = false;
         phashe = &checkHashStruct.phasheType[type];
-
 
         if (readHash<smp, type>(checkHashStruct.rootHash, zobristKeyR, phashe)) {
             if (phashe->from != phashe->to && phashe->flags & 0x3) {    // hashfEXACT or hashfBETA

@@ -18,7 +18,7 @@
 
 #include "Uci.h"
 
-Uci::Uci(const string &fen, int perftDepth, int nCpu, int perftHashSize, const string &dumpFile) {//perft locale
+Uci::Uci(const string &fen, const int perftDepth, const int nCpu, const int perftHashSize, const string &dumpFile) {//perft locale
     perft = &Perft::getInstance();
     perft->setParam(fen, perftDepth, nCpu, perftHashSize, dumpFile);
     runPerftAndExit = true;
@@ -107,7 +107,7 @@ void Uci::listner(IterativeDeeping *it) {
             knowCommand = true;
             searchManager.display();
         } else if (token == "isready") {
-            knowCommand = true;       
+            knowCommand = true;
             cout << "readyok\n";
         } else if (token == "uci") {
             knowCommand = true;
@@ -388,7 +388,7 @@ void Uci::listner(IterativeDeeping *it) {
                         searchManager.setMaxTimeMillsec(searchManager.getMaxTimeMillsec(0) - (int) (searchManager.getMaxTimeMillsec(0) * ((135.0 - btime * 100.0 / wtime) / 100.0)));
                     }
                 }
-                lastTime = searchManager.getMaxTimeMillsec(0)*3;
+                lastTime = searchManager.getMaxTimeMillsec(0) * 3;
                 searchManager.setMaxTimeMillsec(lastTime);
             }
             if (!uciMode) {
