@@ -16,35 +16,42 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined(FULL_TEST)
+#if !defined(FULL_TEST)
 
 #include <gtest/gtest.h>
 #include <set>
 #include "../SearchManager.h"
 #include "../IterativeDeeping.h"
-#include "../Tablebase.h"
+#include "../SYZYGY.h"
 
-TEST(tablebase, test1) {
+TEST(syzygy, bestmove) {
     SearchManager &searchManager = Singleton<SearchManager>::getInstance();
-    Tablebase &tablebase = searchManager.createGtb();
-    if (!tablebase.setPath("/gtb4")) {
+    SYZYGY &tablebase = searchManager.createSYZYGY();
+    if (!tablebase.setPath("/syzygy")) {
         FAIL() << "path error";
     }
 
     IterativeDeeping it;
 
-    if (!searchManager.getGtb().setScheme("cp4")) {
-        FAIL() << "set scheme error";
+    searchManager.loadFen("K7/B7/B7/8/8/8/7n/7k b - - 5 1");
+
+    EXPECT_EQ("Kg2", searchManager.getSYZYGYbestmove(BLACK));
+
+}
+
+TEST(syzygy, dtm) {
+    SearchManager &searchManager = Singleton<SearchManager>::getInstance();
+    SYZYGY &tablebase = searchManager.createSYZYGY();
+    if (!tablebase.setPath("/syzygy")) {
+        FAIL() << "path error";
     }
-    if (!searchManager.getGtb().setInstalledPieces(4)) {
-        FAIL() << "set installed pieces error";
-    }
-    if (!it.getGtbAvailable()) {
-        FAIL() << "error TB not found";
-    }
-    searchManager.loadFen("8/8/8/8/6p1/7p/4kB2/6K1 w - -");
-    EXPECT_EQ(0, searchManager.printDtm());
-    searchManager.deleteGtb();
+
+    IterativeDeeping it;
+
+    searchManager.loadFen("K7/B7/B7/8/8/8/7n/7k b - - 5 1");
+
+    EXPECT_EQ(110, searchManager.getSYZYGYdtm(BLACK));
+
 }
 
 #endif

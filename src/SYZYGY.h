@@ -18,37 +18,48 @@
 
 #pragma once
 
-#include "IterativeDeeping.h"
-#include "perft/Perft.h"
+#include "namespaces/def.h"
+#include "ChessBoard.h"
+#include "util/Singleton.h"
+#include "syzygy/tbprobe.h"
 
-#include <string.h>
-#include "util/String.h"
-
-class Uci : public Singleton<Uci> {
-    friend class Singleton<Uci>;
+class SYZYGY : public Singleton<SYZYGY> {
+    friend class Singleton<SYZYGY>;
 
 public:
-    Uci(const string &fen, const int perftDepth, const int nCpu, const int perftHashSize, const string &dumpFile);
 
-    virtual ~Uci();
+    ~SYZYGY();
+
+    bool getAvailable() const;
+
+    string getPath() const;
+
+    bool setPath(const string &path);
+
+    void restart();
+
+
+    int getDtm(const _Tchessboard &c, const bool turn);
+
+    string getBestmove(const _Tchessboard &c, const bool turn);
 
 private:
-    Uci();
 
-    Perft *perft = nullptr;
 
-    SearchManager &searchManager = Singleton<SearchManager>::getInstance();
 
-    bool uciMode;
-    GTB *gtb = nullptr;
-    SYZYGY *syzygy = nullptr;
 
-    void listner(IterativeDeeping *it);
+    SYZYGY();
 
-    void getToken(istringstream &uip, String &token);
+    int search(const _Tchessboard &c, const bool turn,unsigned* results);
 
-    void startListner();
+    string path = "/syzygy";
 
-    bool runPerftAndExit = false;
+    string pickMove(const unsigned *results,const unsigned wdl);
 
+    int rank(int s) { return ((s) >> 3); }
+
+    int file(int s) { return ((s) & 0x07); }
+
+    u64 decode(u64 d);
 };
+

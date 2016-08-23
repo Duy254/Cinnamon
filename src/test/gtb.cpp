@@ -16,39 +16,35 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#if defined(FULL_TEST)
 
-#include "IterativeDeeping.h"
-#include "perft/Perft.h"
+#include <gtest/gtest.h>
+#include <set>
+#include "../SearchManager.h"
+#include "../IterativeDeeping.h"
+#include "../GTB.h"
 
-#include <string.h>
-#include "util/String.h"
-
-class Uci : public Singleton<Uci> {
-    friend class Singleton<Uci>;
-
-public:
-    Uci(const string &fen, const int perftDepth, const int nCpu, const int perftHashSize, const string &dumpFile);
-
-    virtual ~Uci();
-
-private:
-    Uci();
-
-    Perft *perft = nullptr;
-
+TEST(gtb, test1) {
     SearchManager &searchManager = Singleton<SearchManager>::getInstance();
+    GTB &tablebase = searchManager.createGtb();
+    if (!tablebase.setPath("/gtb4")) {
+        FAIL() << "path error";
+    }
 
-    bool uciMode;
-    GTB *gtb = nullptr;
-    SYZYGY *syzygy = nullptr;
+    IterativeDeeping it;
 
-    void listner(IterativeDeeping *it);
+    if (!searchManager.getGtb().setScheme("cp4")) {
+        FAIL() << "set scheme error";
+    }
+    if (!searchManager.getGtb().setInstalledPieces(4)) {
+        FAIL() << "set installed pieces error";
+    }
+    if (!it.getGtbAvailable()) {
+        FAIL() << "error TB not found";
+    }
+    searchManager.loadFen("8/8/8/8/6p1/7p/4kB2/6K1 w - -");
+    EXPECT_EQ(0, searchManager.printDtm());
+    searchManager.deleteGtb();
+}
 
-    void getToken(istringstream &uip, String &token);
-
-    void startListner();
-
-    bool runPerftAndExit = false;
-
-};
+#endif

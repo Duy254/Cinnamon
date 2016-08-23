@@ -38,14 +38,18 @@ set(SOURCE_FILES
         Search.h
         SearchManager.cpp
         SearchManager.h
-        Tablebase.cpp
-        Tablebase.h
+        GTB.cpp
+        SYZYGY.cpp
         #        Endgame.cpp
         WrapperCinnamon.cpp
         Uci.cpp
         #google test
         test/test.cpp
-        util/Bitboard.cpp util/Bitboard.h)
+        util/Bitboard.cpp util/Bitboard.h
+        #        syzygy/apps/main.cpp
+        syzygy/tbprobe.cpp
+        syzygy/main.cpp
+        )
 
 set(CMAKE_CXX_COMPILER "g++")
 add_executable(cinnamon ${SOURCE_FILES})

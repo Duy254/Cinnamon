@@ -53,6 +53,8 @@ void Uci::listner(IterativeDeeping *it) {
     int perftHashSize = 0;
     string dumpFile;
     static const string _BOOLEAN[] = {"false", "true"};
+    syzygy = &searchManager.createSYZYGY();
+
     while (!stop) {
         if (runPerftAndExit) {
             runPerftAndExit = false;
@@ -165,8 +167,8 @@ void Uci::listner(IterativeDeeping *it) {
                     if (token == "value") {
                         getToken(uip, token);
                         knowCommand = true;
-                        tablebase = &searchManager.createGtb();
-                        tablebase->setPath(token);
+                        gtb = &searchManager.createGtb();
+                        gtb->setPath(token);
                     }
                 }
 
@@ -195,7 +197,7 @@ void Uci::listner(IterativeDeeping *it) {
                     getToken(uip, token);
                     if (token == "value") {
                         getToken(uip, token);
-                        if (tablebase->setCacheSize(stoi(token))) {
+                        if (gtb->setCacheSize(stoi(token))) {
                             knowCommand = true;
                         };
                     }
@@ -209,7 +211,7 @@ void Uci::listner(IterativeDeeping *it) {
                     getToken(uip, token);
                     if (token == "value") {
                         getToken(uip, token);
-                        if (tablebase->setScheme(token)) {
+                        if (gtb->setScheme(token)) {
                             knowCommand = true;
                         };
                     }
@@ -221,7 +223,7 @@ void Uci::listner(IterativeDeeping *it) {
                             getToken(uip, token);
                             if (token == "value") {
                                 getToken(uip, token);
-                                if (tablebase->setInstalledPieces(stoi(token))) {
+                                if (gtb->setInstalledPieces(stoi(token))) {
                                     knowCommand = true;
                                 };
                             }
@@ -240,14 +242,14 @@ void Uci::listner(IterativeDeeping *it) {
                         }
                     } else if (token == "restart") {
                         knowCommand = true;
-                        tablebase->restart();
+                        gtb->restart();
                     } else if (token == "probing") {
                         getToken(uip, token);
                         if (token == "depth") {
                             getToken(uip, token);
                             if (token == "value") {
                                 getToken(uip, token);
-                                if (tablebase->setProbeDepth(stoi(token))) {
+                                if (gtb->setProbeDepth(stoi(token))) {
                                     knowCommand = true;
                                 };
                             }
