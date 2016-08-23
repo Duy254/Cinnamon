@@ -25,7 +25,7 @@ IterativeDeeping::IterativeDeeping() : maxDepth(MAX_PLY), running(false), openBo
 }
 
 void IterativeDeeping::setMaxDepth(int d) {
-    maxDepth = d;
+    maxDepth = min(d, _board::MAX_PLY);
 }
 
 bool IterativeDeeping::getGtbAvailable() {
@@ -111,7 +111,8 @@ void IterativeDeeping::run() {
     int mateIn = INT_MAX;
     string pvv;
     _Tmove resultMove;
-    while (searchManager.getRunning(0) ) {
+    bool foundBestmove = false;
+    while (searchManager.getRunning(0)) {
         totMoves = 0;
         ++mply;
         searchManager.init();
@@ -195,6 +196,7 @@ void IterativeDeeping::run() {
 
             resultMove.capturedPiece = searchManager.getPieceAt(resultMove.side ^ 1, POW2[resultMove.to]);
             bestmove = Search::decodeBoardinv(resultMove.type, resultMove.from, resultMove.side);
+            foundBestmove = true;
             if (!(resultMove.type & (Search::KING_SIDE_CASTLE_MOVE_MASK | Search::QUEEN_SIDE_CASTLE_MOVE_MASK))) {
                 bestmove += Search::decodeBoardinv(resultMove.type, resultMove.to, resultMove.side);
                 searchManager.setKillerHeuristic(resultMove.from, resultMove.to, 0x40000000);
@@ -203,34 +205,37 @@ void IterativeDeeping::run() {
                 }
             }
 
-            if (abs(sc) > _INFINITE - MAX_PLY) {
+            if (sc > _INFINITE - MAX_PLY) {
                 cout << "info score mate 1 depth " << mply;
             } else {
                 cout << "info score cp " << sc << " depth " << mply - extension;
             }
             cout << " nodes " << totMoves << " time " << timeTaken;
-            cout << " nps " << (totMoves / (1+(timeTaken/1000)));
+            cout << " nps " << (totMoves / (1 + (timeTaken / 1000)));
             cout << " pv " << pvv << endl;
         }
 
-        if (searchManager.getForceCheck()) {
-            searchManager.setForceCheck(inMate);
-            searchManager.setRunning(1);
-
-        } else if (abs(sc) > _INFINITE - MAX_PLY) {
+        if (abs(sc) > _INFINITE - MAX_PLY) {
+            inMate = true;
             searchManager.setForceCheck(true);
-            searchManager.setRunning(2);
+        }
 
+        if (!foundBestmove) {
+            searchManager.setRunning(2);
+        } else {
+            if (searchManager.getForceCheck()) {
+                searchManager.setRunning(1);
+            } else if (inMate) {
+                searchManager.setRunning(2);
+            }
         }
         if (mply >= maxDepth + extension && (searchManager.getRunning(0) != 2 || inMate)) {
             break;
         }
 
-        if (abs(sc) > _INFINITE - MAX_PLY) {
-            inMate = true;
-        }
     }
     cout << "bestmove " << bestmove;
+    ASSERT(foundBestmove);
     if (ponderEnabled && ponderMove.size()) {
         cout << " ponder " << ponderMove;
     }

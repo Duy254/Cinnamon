@@ -744,9 +744,8 @@ public:
     }
 
     template<int side>
-    u64 getPin(const u64 allpieces, const u64 friends, const int kingPosition) const {
+    u64 getPin(const u64 allpieces, const u64 friends, const int kingPosition) const {//TODO eliminare?
         u64 result = 0;
-//        allpieces &= NOTPOW2[kingPosition];
         const u64 *s = LINK_SQUARE[kingPosition];
         constexpr int xside = side ^1;
         u64 attacked = DIAGONAL_ANTIDIAGONAL[kingPosition] & (chessboard[QUEEN_BLACK + xside] | chessboard[BISHOP_BLACK + xside]);
@@ -758,9 +757,6 @@ public:
             u64 x = *(s + pos) & (allpieces & NOTPOW2[kingPosition]);
             ASSERT(b == x);
 #endif
-//            u64 b = LINK_SQUARE[kingPosition][pos] & allpieces;
-//            u64 t = b & (b - 1);
-//            if (!t) {
             if (!static_cast<u64>(b & (b - 1))) {
                 result |= b & friends;
             }

@@ -218,10 +218,7 @@ int Search::quiescence(int alpha, int beta, const char promotionPiece, int N_PIE
         sortHashMoves(listId, checkHashStruct.phasheType[Hash::HASH_ALWAYS]);
     }
     while ((move = getNextMove(&gen_list[listId]))) {
-    /*sortList(&gen_list[listId]);
-    for (int k = 0; k < gen_list[listId].size; k++) {
-        move = &gen_list[listId].moveList[k];*/
-        if (!makemove(move, false, true)) {
+         if (!makemove(move, false, true)) {
             takeback(move, oldKey, false);
             continue;
         }
@@ -325,7 +322,6 @@ bool Search::checkInsufficientMaterial(int N_PIECE) {
 
 bool Search::checkDraw(u64 key) {
     int o = 0;
-    int count = 0;
     for (int i = repetitionMapCount - 1; i >= 0; i--) {
         if (repetitionMap[i] == 0) {
             return false;
@@ -411,13 +407,10 @@ int Search::search(int depth, int alpha, int beta, _TpvLine *pline, int N_PIECE,
     u64 allpieces = friends | enemies;
     int is_incheck_side = inCheck<side>(allpieces);
     if (!is_incheck_side && depth != mainDepth) {
-        if (checkInsufficientMaterial(N_PIECE)) {
+        if (checkInsufficientMaterial(N_PIECE) || checkDraw(chessboard[ZOBRISTKEY_IDX])) {
             if (inCheck<side ^ 1>(allpieces)) {
                 return _INFINITE - (mainDepth - depth + 1);
             }
-            return -lazyEval<side>() * 2;
-        }
-        if (checkDraw(chessboard[ZOBRISTKEY_IDX])) {
             return -lazyEval<side>() * 2;
         }
     }
@@ -516,9 +509,6 @@ int Search::search(int depth, int alpha, int beta, _TpvLine *pline, int N_PIECE,
     int countMove = 0;
     char hashf = Hash::hashfALPHA;
     while ((move = getNextMove(&gen_list[listId]))) {
-   /* sortList(&gen_list[listId]);
-    for (int k = 0; k < gen_list[listId].size; k++) {
-        move = &gen_list[listId].moveList[k];*/
         countMove++;
         INC(betaEfficiencyCount);
         if (!makemove(move, true, checkInCheck)) {

@@ -63,7 +63,7 @@ public:
 
     void clearAge();
 
-    int getForceCheck();
+    bool getForceCheck();
 
     u64 getZobristKey(int id);
 
@@ -93,7 +93,7 @@ public:
 
     void clearHash();
 
-    int getMaxTimeMillsec();
+    int getMaxTimeMillsec(const int);
 
     void setNullMove(bool i);
 
